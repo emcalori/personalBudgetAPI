@@ -1,10 +1,9 @@
 {
     "type": "object",
-    "required": ["name", "id", "budget"],
+    "required": ["name", "budget"],
     "allOf": [{
         "properties": {
             "name": {"type": "string"},
-            "id": {"type": "integer", "minimum": 1},
             "budget": {"type": "integer", "minimum": 1}
         },
         "additionalProperties": false
