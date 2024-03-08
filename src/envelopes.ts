@@ -136,4 +136,29 @@ router.patch("/transfer", (req: Request, res: Response, next: NextFunction) => {
   }
 });
 
+router.delete("/:id", (req: Request, res: Response, next: NextFunction) => {
+  try {
+    const matchingEnvelope = envelopes.filter((envelope) => {
+      if (envelope.id === req.params.id) {
+        return envelope;
+      }
+    });
+
+    if (matchingEnvelope.length === 0) {
+      res.status(404).send(`Envelope with id ${req.params.id} not found`);
+      throw new Error(`Envelope with id ${req.params.id} not found`);
+    }
+
+    envelopes = envelopes.filter((envelope) => {
+      if (envelope.id !== req.params.id) {
+        return envelope;
+      }
+    });
+
+    res.send(`Envelope with id ${req.params.id} deleted successfully`);
+  } catch (error) {
+    next(error);
+  }
+});
+
 export default router;

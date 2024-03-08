@@ -4,7 +4,7 @@ import { app } from "./app";
 
 const envelopeMock = jest.mock("./envelopes", () => ({
   __esModule: true,
-  envelopes: [{ name: "Test", budget: 10, id: "0" } as Envelope],
+  envelopes: [],
 }));
 
 jest.mock("uuid", () => ({ v4: () => "2" }));
@@ -149,5 +149,24 @@ describe("envelopes.ts", () => {
     const { statusCode } = response;
 
     expect(statusCode).toBe(400);
+  });
+
+  it("should return envelope with id 123delete deleted successfully (DELETE /:id)", async () => {
+    envelopes.push({
+      name: "toDelete",
+      budget: 10,
+      id: "123delete",
+    } as Envelope);
+    const response = await request(app).delete("/envelopes/123delete");
+    const { statusCode } = response;
+
+    expect(statusCode).toBe(200);
+  });
+
+  it("should return envelope with id 123 is not found (DELETE /:id)", async () => {
+    const response = await request(app).delete("/envelopes/123");
+    const { statusCode } = response;
+
+    expect(statusCode).toBe(404);
   });
 });
