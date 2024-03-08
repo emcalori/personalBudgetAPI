@@ -1,0 +1,11 @@
+{
+    "type": "object",
+    "required": ["amount"],
+    "allOf": [{
+        "properties": {
+            "amount": {"type": "integer", "minimum": 1}
+        },
+        "additionalProperties": false
+    }]
+
+}

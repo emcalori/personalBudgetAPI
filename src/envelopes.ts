@@ -1,6 +1,7 @@
 import express, { NextFunction, Request, Response } from "express";
 import envelopeSchema from "./schemas/Envelope.json";
 import transferSchema from "./schemas/Transfer.json";
+import withdrawSchema from "./schemas/Withdraw.json";
 import { validate } from "./utils/validate";
 import * as uuid from "uuid";
 
@@ -160,5 +161,61 @@ router.delete("/:id", (req: Request, res: Response, next: NextFunction) => {
     next(error);
   }
 });
+
+router.post(
+  "/withdraw/:id",
+  (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const isValid = validate(withdrawSchema, req.body);
+      if (isValid.isValid) {
+        const matchingEnvelope = envelopes.filter((envelope) => {
+          if (envelope.id === req.params.id) {
+            return envelope;
+          }
+        });
+
+        if (matchingEnvelope.length === 0) {
+          res.status(404).send(`Envelope with id ${req.params.id} not found`);
+          throw new Error(`Envelope with id ${req.params.id} not found`);
+        }
+
+        envelopes = envelopes.map((envelope) => {
+          if (envelope.id === req.params.id) {
+            if (envelope.budget - Number(req.body.amount) < 0) {
+              res
+                .status(400)
+                .send(
+                  `Insufficient funds in envelope: ${envelope.name}, id: ${envelope.id}`,
+                );
+              throw new Error(
+                `Insufficient funds in envelope: ${envelope.name}, id: ${envelope.id}`,
+              );
+            }
+            return {
+              ...envelope,
+              budget: envelope.budget - Number(req.body.amount),
+            };
+          }
+          return envelope;
+        });
+
+        res.status(201).send(
+          envelopes.filter((envelope) => {
+            if (envelope.id === req.params.id) {
+              return envelope;
+            }
+          }),
+        );
+      } else {
+        res.status(400).send(isValid.errors);
+        throw new Error(
+          `Schema not validated:\n ${JSON.stringify(isValid.errors)}`,
+        );
+      }
+    } catch (error) {
+      next(error);
+    }
+  },
+);
 
 export default router;

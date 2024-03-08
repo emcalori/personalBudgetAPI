@@ -91,7 +91,7 @@ describe("envelopes.ts", () => {
     ]);
   });
 
-  it("should return 404, envelopes do not exist (PATCH /trasnfer)", async () => {
+  it("should return 404, envelopes do not exist (PATCH /transfer)", async () => {
     const response = await request(app)
       .patch("/envelopes/transfer")
       .set("Accept", "application/json")
@@ -106,7 +106,7 @@ describe("envelopes.ts", () => {
     expect(statusCode).toBe(404);
   });
 
-  it("should return 404, envelope 44 does not exist (PATCH /trasnfer)", async () => {
+  it("should return 404, envelope 44 does not exist (PATCH /transfer)", async () => {
     const response = await request(app)
       .patch("/envelopes/transfer")
       .set("Accept", "application/json")
@@ -121,7 +121,7 @@ describe("envelopes.ts", () => {
     expect(statusCode).toBe(404);
   });
 
-  it("should return 400, envelope 1 does not have sufficient funds (PATCH /trasnfer)", async () => {
+  it("should return 400, envelope 1 does not have sufficient funds (PATCH /transfer)", async () => {
     const response = await request(app)
       .patch("/envelopes/transfer")
       .set("Accept", "application/json")
@@ -136,7 +136,7 @@ describe("envelopes.ts", () => {
     expect(statusCode).toBe(400);
   });
 
-  it("should return 400, request payload is not validated by schema (PATCH /trasnfer)", async () => {
+  it("should return 400, request payload is not validated by schema (PATCH /transfer)", async () => {
     const response = await request(app)
       .patch("/envelopes/transfer")
       .set("Accept", "application/json")
@@ -168,5 +168,51 @@ describe("envelopes.ts", () => {
     const { statusCode } = response;
 
     expect(statusCode).toBe(404);
+  });
+
+  it("should return 201 (POST /withdraw/:id)", async () => {
+    const response = await request(app)
+      .post("/envelopes/withdraw/2")
+      .set("Accept", "application/json")
+      .send({
+        amount: 10,
+      });
+    const { statusCode } = response;
+
+    expect(statusCode).toBe(201);
+  });
+
+  it("should return 400 schema not validated (POST /withdraw/:id)", async () => {
+    const response = await request(app)
+      .post("/envelopes/withdraw/2")
+      .set("Accept", "application/json")
+      .send({});
+    const { statusCode } = response;
+
+    expect(statusCode).toBe(400);
+  });
+
+  it("should return 404 enevelope not found (POST /withdraw/:id)", async () => {
+    const response = await request(app)
+      .post("/envelopes/withdraw/50")
+      .set("Accept", "application/json")
+      .send({
+        amount: 10,
+      });
+    const { statusCode } = response;
+
+    expect(statusCode).toBe(404);
+  });
+
+  it("should return 400 insufficient funds (POST /withdraw/:id)", async () => {
+    const response = await request(app)
+      .post("/envelopes/withdraw/1")
+      .set("Accept", "application/json")
+      .send({
+        amount: 1000,
+      });
+    const { statusCode } = response;
+
+    expect(statusCode).toBe(400);
   });
 });
