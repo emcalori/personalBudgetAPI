@@ -4,7 +4,7 @@
     "allOf": [{
         "properties": {
             "name": {"type": "string"},
-            "budget": {"type": "integer", "minimum": 1}
+            "budget": {"type": "integer", "minimum": 0}
         },
         "additionalProperties": false
     }]

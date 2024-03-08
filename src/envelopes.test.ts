@@ -63,4 +63,91 @@ describe("envelopes.ts", () => {
 
     expect(statusCode).toBe(404);
   });
+
+  it("should successfully transfer money from envelope 1 to envelope 2 (PATCH /transfer)", async () => {
+    const response = await request(app)
+      .patch("/envelopes/transfer")
+      .set("Accept", "application/json")
+      .send({
+        sourceEnvelopeId: "1",
+        targetEnvelopeId: "2",
+        amount: 1,
+      });
+
+    const { body, statusCode } = response;
+
+    expect(statusCode).toBe(200);
+    expect(body).toEqual([
+      {
+        budget: 9,
+        id: "1",
+        name: "Test",
+      },
+      {
+        budget: 76,
+        id: "2",
+        name: "Test2",
+      },
+    ]);
+  });
+
+  it("should return 404, envelopes do not exist (PATCH /trasnfer)", async () => {
+    const response = await request(app)
+      .patch("/envelopes/transfer")
+      .set("Accept", "application/json")
+      .send({
+        sourceEnvelopeId: "33",
+        targetEnvelopeId: "44",
+        amount: 100,
+      });
+
+    const { statusCode } = response;
+
+    expect(statusCode).toBe(404);
+  });
+
+  it("should return 404, envelope 44 does not exist (PATCH /trasnfer)", async () => {
+    const response = await request(app)
+      .patch("/envelopes/transfer")
+      .set("Accept", "application/json")
+      .send({
+        sourceEnvelopeId: "1",
+        targetEnvelopeId: "44",
+        amount: 1,
+      });
+
+    const { statusCode } = response;
+
+    expect(statusCode).toBe(404);
+  });
+
+  it("should return 400, envelope 1 does not have sufficient funds (PATCH /trasnfer)", async () => {
+    const response = await request(app)
+      .patch("/envelopes/transfer")
+      .set("Accept", "application/json")
+      .send({
+        sourceEnvelopeId: "1",
+        targetEnvelopeId: "2",
+        amount: 100,
+      });
+
+    const { statusCode } = response;
+
+    expect(statusCode).toBe(400);
+  });
+
+  it("should return 400, request payload is not validated by schema (PATCH /trasnfer)", async () => {
+    const response = await request(app)
+      .patch("/envelopes/transfer")
+      .set("Accept", "application/json")
+      .send({
+        source: "1",
+        target: "2",
+        budget: 100,
+      });
+
+    const { statusCode } = response;
+
+    expect(statusCode).toBe(400);
+  });
 });

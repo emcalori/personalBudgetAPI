@@ -1,0 +1,13 @@
+{
+    "type": "object",
+    "required": ["sourceEnvelopeId", "targetEnvelopeId", "amount"],
+    "allOf": [{
+        "properties": {
+            "sourceEnvelopeId": {"type": "string"},
+            "targetEnvelopeId": {"type": "string"},
+            "amount": {"type": "integer", "minimum": 1}
+        },
+        "additionalProperties": false
+    }]
+
+}
